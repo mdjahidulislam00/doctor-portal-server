@@ -36,7 +36,28 @@ app.post('/addAppointment', async (req, res) => {
     }
 })
 
+//all Data Read from database
+app.get('/getAllData', async (req, res) => {
+  const client = new MongoClient(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
+
+  try {
+    await client.connect();
+
+    const db = client.db(process.env.DB_NAME);
+    const coll = db.collection(process.env.DB_COLL);
+
+    const data = await coll.find().toArray();
+
+    res.status(200).json(data);
+    console.log(data)
+  } catch (error) {
+    console.error('Error fetching data from MongoDB:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  } finally {
+    client.close();
+  }
+});
 
 
 
-app.listen(port, () => console.log('running on port 5000'))
+app.listen(port, () => console.log(`running on port ${port}`))
